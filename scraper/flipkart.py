@@ -5,16 +5,14 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
 import time
-import os
 
 def get_flipkart_price(url):
     options = Options()
-    # Uncomment for production use
-    # options.add_argument('--headless=new')
+    options.add_argument('--headless=new')
     options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--window-size=1920,1080')
+    options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
 
     driver = webdriver.Chrome(options=options)
@@ -24,166 +22,167 @@ def get_flipkart_price(url):
         print(f"Accessing URL: {url}")
         driver.get(url)
         
-        # Wait for page to load completely
+        # Wait for page to load properly
         time.sleep(3)
-        
-        # Take screenshot for debugging
-        screenshot_path = "flipkart_debug.png"
-        driver.save_screenshot(screenshot_path)
-        print(f"Screenshot saved to {os.path.abspath(screenshot_path)}")
-
-        wait = WebDriverWait(driver, 10)
         
         # Get title
         try:
-            meta_tag = wait.until(
+            meta_tag = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//meta[@property='og:title']"))
             )
             result["title"] = meta_tag.get_attribute("content")
-            print(f"Found title from meta tag: {result['title']}")
-        except Exception as e:
+            print(f"Found title: {result['title']}")
+        except:
             try:
-                title_element = wait.until(
-                    EC.presence_of_element_located((By.CLASS_NAME, "B_NuCI"))
-                )
+                title_element = driver.find_element(By.CLASS_NAME, "B_NuCI")
                 result["title"] = title_element.text.strip()
-                print(f"Found title from page element: {result['title']}")
+                print(f"Found title: {result['title']}")
             except:
                 print("Failed to extract title")
         
-        # Debug: Save page source
-        html_source = driver.page_source
-        with open("flipkart_page_source.html", "w", encoding="utf-8") as f:
-            f.write(html_source)
-        print(f"Page source saved to {os.path.abspath('flipkart_page_source.html')}")
-        
-        # Approach 1: Try specific Flipkart price selectors first
-        price_selectors = [
-            "._30jeq3._16Jk6d",      # Most common main price selector
-            "._30jeq3",               # Alternative common price selector
-            ".CEmiEU",                # Another price selector
-            ".dyC4hf .CEmiEU"         # Nested price structure
+        primary_selectors = [
+            "div._16Jk6d", # Specific main price selector
+            "div._30jeq3._16Jk6d", # Very common main price selector
+            "div._30jeq3._1_WHN1", # Another common main price format
+            "div._30jeq3" # General price selector
         ]
         
-        for selector in price_selectors:
+        for selector in primary_selectors:
             try:
-                print(f"Trying selector: {selector}")
-                price_elements = driver.find_elements(By.CSS_SELECTOR, selector)
+                # Try to find elements with specific CSS selectors
+                elements = driver.find_elements(By.CSS_SELECTOR, selector)
                 
-                if price_elements:
-                    for idx, elem in enumerate(price_elements):
-                        print(f"  Found element {idx+1}: {elem.text}")
+                if elements:
+                    # Sort by position (top elements are usually the main price)
+                    sorted_elements = sorted(elements, key=lambda e: e.location['y'])
                     
-                    # Use the first price element that has valid price format and appears to be a main price
+                    for elem in sorted_elements:
+                        if not elem.is_displayed():
+                            continue
+                            
+                        price_str = elem.text.strip()
+                        
+                        # Skip promotional elements
+                        skip_keywords = ['off', 'emi', 'month', 'save', 'discount', 'cashback', 'extra']
+                        if any(keyword.lower() in price_str.lower() for keyword in skip_keywords):
+                            continue
+                        
+                        # Extract price
+                        price_match = re.search(r'(?:₹|Rs\.?)\s*([\d,]+)', price_str)
+                        if price_match:
+                            candidate_price = int(price_match.group(1).replace(",", ""))
+                            # Validate price is in a reasonable range for products
+                            if 100 <= candidate_price <= 500000:
+                                result["price"] = candidate_price
+                                print(f"Found price with selector {selector}: ₹{result['price']}")
+                                break
+                
+                if result["price"] is not None:
+                    break
+            except Exception as e:
+                print(f"Error with selector {selector}: {str(e)[:50]}")
+        
+        if result["price"] is None:
+            try:
+                # Look for containers that often hold price information
+                price_containers = driver.find_elements(By.CSS_SELECTOR, "div.dyC4hf, div._25b18c, div._3LxTgx")
+                
+                for container in price_containers:
+                    # Find all price-like elements within this container
+                    price_elements = container.find_elements(By.XPATH, ".//*[contains(text(), '₹') or contains(text(), 'Rs')]")
+                    
                     for elem in price_elements:
                         price_str = elem.text.strip()
                         
-                        # Skip elements with certain keywords that indicate it's not the main price
+                        # Skip promotional elements
                         skip_keywords = ['off', 'emi', 'month', 'save', 'discount', 'cashback', 'extra']
                         if any(keyword.lower() in price_str.lower() for keyword in skip_keywords):
-                            print(f"  Skipping text with promotional keywords: {price_str}")
                             continue
                         
+                        # Extract price
                         price_match = re.search(r'(?:₹|Rs\.?)\s*([\d,]+)', price_str)
                         if price_match:
-                            result["price"] = int(price_match.group(1).replace(",", ""))
-                            print(f"Found main price: ₹{result['price']}")
-                            break
+                            candidate_price = int(price_match.group(1).replace(",", ""))
+                            # Validate price
+                            if 100 <= candidate_price <= 500000:
+                                result["price"] = candidate_price
+                                print(f"Found price in container: ₹{result['price']}")
+                                break
                     
                     if result["price"] is not None:
                         break
             except Exception as e:
-                print(f"Error with selector {selector}: {str(e)[:100]}...")
+                print(f"Error finding price in containers: {str(e)[:50]}")
         
-        # Approach 2: If no specific selectors worked, try to find any price-like element
         if result["price"] is None:
             try:
-                print("Trying main price detection by size and position...")
+                # Look for JSON-LD structured data
+                script_elements = driver.find_elements(By.XPATH, "//script[@type='application/ld+json']")
                 
-                # Find all price elements (containing ₹ or Rs)
-                all_price_elements = driver.find_elements(By.XPATH, 
-                    "//*[contains(text(), '₹') or contains(text(), 'Rs')]")
-                
-                # Filter out elements with promotional keywords
-                filtered_elements = []
-                for elem in all_price_elements:
-                    elem_text = elem.text.strip()
-                    skip_keywords = ['off', 'emi', 'month', 'save', 'discount', 'cashback', 'extra']
-                    if not any(keyword.lower() in elem_text.lower() for keyword in skip_keywords):
-                        filtered_elements.append(elem)
-                        
-                # Get the largest-font price element (usually the main price)
-                largest_font_size = 0
-                largest_font_element = None
-                
-                for elem in filtered_elements:
-                    try:
-                        font_size_str = elem.value_of_css_property('font-size')
-                        font_size = float(font_size_str.replace('px', ''))
-                        print(f"  Element: {elem.text} - Font size: {font_size}")
-                        
-                        if font_size > largest_font_size:
-                            largest_font_size = font_size
-                            largest_font_element = elem
-                    except:
-                        continue
-                
-                if largest_font_element is not None:
-                    elem_text = largest_font_element.text.strip()
-                    price_match = re.search(r'(?:₹|Rs\.?)\s*([\d,]+)', elem_text)
+                for script in script_elements:
+                    script_content = script.get_attribute('innerHTML')
+                    # Look for price pattern in the script content
+                    price_match = re.search(r'"price":\s*"?(\d+(?:\.\d+)?)"?', script_content)
                     if price_match:
-                        result["price"] = int(price_match.group(1).replace(",", ""))
-                        print(f"Found main price by font size: ₹{result['price']}")
+                        candidate_price = int(float(price_match.group(1)))
+                        if 100 <= candidate_price <= 500000:
+                            result["price"] = candidate_price
+                            print(f"Found price in structured data: ₹{result['price']}")
+                            break
             except Exception as e:
-                print(f"Error in main price detection: {str(e)[:100]}...")
+                print(f"Error checking structured data: {str(e)[:50]}")
         
-        # Approach 3: Last resort - find all numbers and get the most likely price
         if result["price"] is None:
             try:
-                print("Trying price detection by value analysis...")
-                all_elements = driver.find_elements(By.XPATH, "//*")
+                # Find all elements with price-like content
                 price_candidates = []
+                price_elements = driver.find_elements(By.XPATH, "//*[contains(text(), '₹') or contains(text(), 'Rs')]")
                 
-                for elem in all_elements:
-                    try:
-                        elem_text = elem.text.strip()
-                        if not elem_text:
-                            continue
-                            
-                        # Skip texts with promotional keywords
-                        skip_keywords = ['off', 'emi', 'month', 'save', 'discount', 'cashback', 'extra']
-                        if any(keyword.lower() in elem_text.lower() for keyword in skip_keywords):
-                            continue
-                        
-                        # Extract prices using regex
-                        price_matches = re.findall(r'(?:₹|Rs\.?)\s*([\d,]+)', elem_text)
-                        for price_match in price_matches:
-                            price_value = int(price_match.replace(",", ""))
-                            # Only consider prices in a reasonable range (e.g., ₹500 to ₹200,000)
-                            if 500 <= price_value <= 200000:
-                                price_candidates.append({
-                                    "price": price_value,
-                                    "element": elem,
-                                    "text": elem_text
-                                })
-                    except:
+                for elem in price_elements:
+                    if not elem.is_displayed():
                         continue
+                        
+                    price_str = elem.text.strip()
+                    
+                    # Skip promotional elements
+                    skip_keywords = ['off', 'emi', 'month', 'save', 'discount', 'cashback', 'extra']
+                    if any(keyword.lower() in price_str.lower() for keyword in skip_keywords):
+                        continue
+                    
+                    # Extract price
+                    price_match = re.search(r'(?:₹|Rs\.?)\s*([\d,]+)', price_str)
+                    if price_match:
+                        candidate_price = int(price_match.group(1).replace(",", ""))
+                        
+                        # Only consider reasonable prices
+                        if 100 <= candidate_price <= 500000:
+                            # Try to get font size (larger font = more likely to be main price)
+                            try:
+                                font_size = elem.value_of_css_property('font-size')
+                                font_size_value = float(font_size.replace('px', ''))
+                            except:
+                                font_size_value = 0
+                                
+                            # Get position (higher on page = more likely to be main price)
+                            y_position = elem.location['y']
+                            
+                            price_candidates.append({
+                                "price": candidate_price,
+                                "font_size": font_size_value,
+                                "y_position": y_position,
+                                "element": elem
+                            })
                 
                 if price_candidates:
-                    # Sort by price value (typically the most expensive one is the main price 
-                    # if there are multiple options)
-                    price_candidates.sort(key=lambda x: x["price"], reverse=True)
-                    for candidate in price_candidates:
-                        print(f"  Price candidate: ₹{candidate['price']} - Text: {candidate['text']}")
-                    
-                    # Select the first candidate (typically the most expensive one)
+                    # Sort by font size (larger first), then by position (higher on page first)
+                    price_candidates.sort(key=lambda x: (-x["font_size"], x["y_position"]))
                     result["price"] = price_candidates[0]["price"]
-                    print(f"Found main price by value analysis: ₹{result['price']}")
+                    print(f"Found price through prominence analysis: ₹{result['price']}")
             except Exception as e:
-                print(f"Error in price by value analysis: {str(e)[:100]}...")
+                print(f"Error in prominence analysis: {str(e)[:50]}")
             
     except Exception as e:
-        print(f"Overall error in scraping: {str(e)[:150]}...")
+        print(f"Error in scraping: {str(e)[:80]}")
     finally:
         driver.quit()
     
@@ -191,7 +190,7 @@ def get_flipkart_price(url):
 
 # Example usage
 if __name__ == "__main__":
-    url = "https://dl.flipkart.com/s/yp!!ZXNNNN"  # Your actual product URL
+    url = "https://dl.flipkart.com/s/Q_mcHqNNNN"  # Replace with your product URL
     product_info = get_flipkart_price(url)
     print("\nFinal Results:")
     print(f"Title: {product_info['title']}")
