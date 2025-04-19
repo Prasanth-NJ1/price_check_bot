@@ -5,8 +5,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
 import time
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from db import add_or_update_product
 
-def get_myntra_price(url):
+def get_myntra_price(url,user_id):
     options = Options()
     # For production, uncomment the line below
     options.add_argument('--headless=new')
@@ -186,12 +190,21 @@ def get_myntra_price(url):
     finally:
         driver.quit()
     
+        if result["title"] != "Title not found" and result["price"] is not None:
+            try:
+                add_or_update_product(user_id, url, "myntra", result["title"], result["price"])
+                print("[DB] Product saved to MongoDB")
+            except Exception as db_error:
+                print(f"[DB ERROR] Failed to save to MongoDB: {db_error}")
+
+    
     return result
 
 # Example usage
 if __name__ == "__main__":
     url = "https://www.myntra.com/mailers/apparel-set/arrow/arrow-2-piece-slim-fit-single-breasted-formal-suit/22180132/buy?utm_source=social_share_pdp&utm_medium=deeplink&utm_campaign=social_share_pdp_deeplink"  # Replace with actual Myntra product URL
-    product_info = get_myntra_price(url)
+    user_id = 1972
+    product_info = get_myntra_price(url,user_id)
     print("\nFinal Results:")
     print(f"Title: {product_info['title']}")
     print(f"Price: {'₹' + str(product_info['price']) if product_info['price'] else 'Not found'}")

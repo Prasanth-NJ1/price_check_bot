@@ -2,8 +2,12 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 import time
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from db import add_or_update_product
 
-def get_amazon_price(url):
+def get_amazon_price(url, user_id):
     options = Options()
     options.add_argument('--headless=new')  
     options.add_argument('--disable-gpu')
@@ -21,6 +25,7 @@ def get_amazon_price(url):
         price = float(f"{price_whole}.{price_fraction}")
 
         # price = int(price_str)
+        add_or_update_product(user_id, url, "amazon", title, price)
 
         return {
             "title": title,

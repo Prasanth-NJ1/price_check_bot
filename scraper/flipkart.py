@@ -5,8 +5,12 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
 import time
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from db import add_or_update_product
 
-def get_flipkart_price(url):
+def get_flipkart_price(url, user_id):
     options = Options()
     options.add_argument('--headless=new')
     options.add_argument('--disable-gpu')
@@ -21,11 +25,8 @@ def get_flipkart_price(url):
     try:
         print(f"Accessing URL: {url}")
         driver.get(url)
-        
-        # Wait for page to load properly
+
         time.sleep(3)
-        
-        # Get title
         try:
             meta_tag = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//meta[@property='og:title']"))
@@ -49,11 +50,9 @@ def get_flipkart_price(url):
         
         for selector in primary_selectors:
             try:
-                # Try to find elements with specific CSS selectors
                 elements = driver.find_elements(By.CSS_SELECTOR, selector)
                 
                 if elements:
-                    # Sort by position (top elements are usually the main price)
                     sorted_elements = sorted(elements, key=lambda e: e.location['y'])
                     
                     for elem in sorted_elements:
@@ -61,17 +60,13 @@ def get_flipkart_price(url):
                             continue
                             
                         price_str = elem.text.strip()
-                        
-                        # Skip promotional elements
                         skip_keywords = ['off', 'emi', 'month', 'save', 'discount', 'cashback', 'extra']
                         if any(keyword.lower() in price_str.lower() for keyword in skip_keywords):
                             continue
-                        
-                        # Extract price
+
                         price_match = re.search(r'(?:₹|Rs\.?)\s*([\d,]+)', price_str)
                         if price_match:
                             candidate_price = int(price_match.group(1).replace(",", ""))
-                            # Validate price is in a reasonable range for products
                             if 100 <= candidate_price <= 500000:
                                 result["price"] = candidate_price
                                 print(f"Found price with selector {selector}: ₹{result['price']}")
@@ -84,22 +79,16 @@ def get_flipkart_price(url):
         
         if result["price"] is None:
             try:
-                # Look for containers that often hold price information
                 price_containers = driver.find_elements(By.CSS_SELECTOR, "div.dyC4hf, div._25b18c, div._3LxTgx")
                 
                 for container in price_containers:
-                    # Find all price-like elements within this container
                     price_elements = container.find_elements(By.XPATH, ".//*[contains(text(), '₹') or contains(text(), 'Rs')]")
                     
                     for elem in price_elements:
                         price_str = elem.text.strip()
-                        
-                        # Skip promotional elements
                         skip_keywords = ['off', 'emi', 'month', 'save', 'discount', 'cashback', 'extra']
                         if any(keyword.lower() in price_str.lower() for keyword in skip_keywords):
                             continue
-                        
-                        # Extract price
                         price_match = re.search(r'(?:₹|Rs\.?)\s*([\d,]+)', price_str)
                         if price_match:
                             candidate_price = int(price_match.group(1).replace(",", ""))
@@ -116,12 +105,10 @@ def get_flipkart_price(url):
         
         if result["price"] is None:
             try:
-                # Look for JSON-LD structured data
                 script_elements = driver.find_elements(By.XPATH, "//script[@type='application/ld+json']")
                 
                 for script in script_elements:
                     script_content = script.get_attribute('innerHTML')
-                    # Look for price pattern in the script content
                     price_match = re.search(r'"price":\s*"?(\d+(?:\.\d+)?)"?', script_content)
                     if price_match:
                         candidate_price = int(float(price_match.group(1)))
@@ -134,7 +121,6 @@ def get_flipkart_price(url):
         
         if result["price"] is None:
             try:
-                # Find all elements with price-like content
                 price_candidates = []
                 price_elements = driver.find_elements(By.XPATH, "//*[contains(text(), '₹') or contains(text(), 'Rs')]")
                 
@@ -143,27 +129,21 @@ def get_flipkart_price(url):
                         continue
                         
                     price_str = elem.text.strip()
-                    
-                    # Skip promotional elements
                     skip_keywords = ['off', 'emi', 'month', 'save', 'discount', 'cashback', 'extra']
                     if any(keyword.lower() in price_str.lower() for keyword in skip_keywords):
                         continue
-                    
-                    # Extract price
+
                     price_match = re.search(r'(?:₹|Rs\.?)\s*([\d,]+)', price_str)
                     if price_match:
                         candidate_price = int(price_match.group(1).replace(",", ""))
-                        
-                        # Only consider reasonable prices
+
                         if 100 <= candidate_price <= 500000:
-                            # Try to get font size (larger font = more likely to be main price)
                             try:
                                 font_size = elem.value_of_css_property('font-size')
                                 font_size_value = float(font_size.replace('px', ''))
                             except:
                                 font_size_value = 0
-                                
-                            # Get position (higher on page = more likely to be main price)
+
                             y_position = elem.location['y']
                             
                             price_candidates.append({
@@ -174,7 +154,6 @@ def get_flipkart_price(url):
                             })
                 
                 if price_candidates:
-                    # Sort by font size (larger first), then by position (higher on page first)
                     price_candidates.sort(key=lambda x: (-x["font_size"], x["y_position"]))
                     result["price"] = price_candidates[0]["price"]
                     print(f"Found price through prominence analysis: ₹{result['price']}")
@@ -185,13 +164,22 @@ def get_flipkart_price(url):
         print(f"Error in scraping: {str(e)[:80]}")
     finally:
         driver.quit()
+
+    if result["title"] != "Title not found" and result["price"] is not None:
+        try:
+            add_or_update_product(user_id, url, "flipkart", result["title"], result["price"])
+            print("[DB] Product saved to MongoDB")
+        except Exception as db_error:
+            print(f"[DB ERROR] Failed to save to MongoDB: {db_error}")
+
     
     return result
 
 # Example usage
 if __name__ == "__main__":
     url = "https://dl.flipkart.com/s/Q_mcHqNNNN"  # Replace with your product URL
-    product_info = get_flipkart_price(url)
+    user_id = 1897
+    product_info = get_flipkart_price(url, user_id)
     print("\nFinal Results:")
     print(f"Title: {product_info['title']}")
     print(f"Price: {'₹' + str(product_info['price']) if product_info['price'] else 'Not found'}")
