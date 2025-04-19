@@ -1,0 +1,32 @@
+2025-04-19 12:49:43,132 - price_checker - INFO - Starting price check for all products
+2025-04-19 12:49:43,472 - price_checker - ERROR - Error checking price for https://amzn.in/d/5GzFTKD: get_amazon_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:49:43,473 - price_checker - ERROR - Error checking price for https://dl.flipkart.com/s/Q_mcHqNNNN: get_flipkart_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:49:43,473 - price_checker - ERROR - Error checking price for https://www.myntra.com/mailers/apparel-set/arrow/arrow-2-piece-slim-fit-single-breasted-formal-suit/22180132/buy?utm_source=social_share_pdp&utm_medium=deeplink&utm_campaign=social_share_pdp_deeplink: get_myntra_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:49:43,474 - price_checker - INFO - Price check complete. Checked 3 products. Found 0 price changes.
+2025-04-19 12:51:42,964 - price_checker - INFO - Starting price check for all products
+2025-04-19 12:51:43,362 - price_checker - ERROR - Error checking price for https://amzn.in/d/5GzFTKD: get_amazon_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:51:43,362 - price_checker - ERROR - Error checking price for https://dl.flipkart.com/s/Q_mcHqNNNN: get_flipkart_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:51:43,362 - price_checker - ERROR - Error checking price for https://www.myntra.com/mailers/apparel-set/arrow/arrow-2-piece-slim-fit-single-breasted-formal-suit/22180132/buy?utm_source=social_share_pdp&utm_medium=deeplink&utm_campaign=social_share_pdp_deeplink: get_myntra_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:51:43,362 - price_checker - INFO - Price check complete. Checked 3 products. Found 0 price changes.
+2025-04-19 12:54:43,890 - price_checker - INFO - Starting price check for all products
+2025-04-19 12:54:44,277 - price_checker - ERROR - Error checking price for https://amzn.in/d/5GzFTKD: get_amazon_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:54:44,277 - price_checker - ERROR - Error checking price for https://dl.flipkart.com/s/Q_mcHqNNNN: get_flipkart_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:54:44,277 - price_checker - ERROR - Error checking price for https://www.myntra.com/mailers/apparel-set/arrow/arrow-2-piece-slim-fit-single-breasted-formal-suit/22180132/buy?utm_source=social_share_pdp&utm_medium=deeplink&utm_campaign=social_share_pdp_deeplink: get_myntra_price() missing 1 required positional argument: 'user_id'
+2025-04-19 12:54:44,286 - price_checker - INFO - Price check complete. Checked 3 products. Found 0 price changes.
+2025-04-19 13:01:23,400 - price_checker - INFO - Starting price check for all products
+2025-04-19 13:01:23,804 - price_checker - ERROR - Error checking price for https://amzn.in/d/5GzFTKD: get_amazon_price() missing 1 required positional argument: 'user_id'
+2025-04-19 13:01:23,804 - price_checker - ERROR - Error checking price for https://dl.flipkart.com/s/Q_mcHqNNNN: get_flipkart_price() missing 1 required positional argument: 'user_id'
+2025-04-19 13:01:23,806 - price_checker - ERROR - Error checking price for https://www.myntra.com/mailers/apparel-set/arrow/arrow-2-piece-slim-fit-single-breasted-formal-suit/22180132/buy?utm_source=social_share_pdp&utm_medium=deeplink&utm_campaign=social_share_pdp_deeplink: get_myntra_price() missing 1 required positional argument: 'user_id'
+2025-04-19 13:01:23,834 - price_checker - INFO - Price check complete. Checked 4 products. Found 0 price changes.
+2025-04-19 13:06:26,010 - price_checker - INFO - Starting price check for all products
+2025-04-19 13:06:37,131 - price_checker - ERROR - Failed to get price for https://amzn.in/d/5GzFTKD
+2025-04-19 13:06:45,775 - price_checker - ERROR - Failed to get price for https://dl.flipkart.com/s/Q_mcHqNNNN
+2025-04-19 13:06:55,063 - price_checker - ERROR - Failed to get price for https://www.myntra.com/mailers/apparel-set/arrow/arrow-2-piece-slim-fit-single-breasted-formal-suit/22180132/buy?utm_source=social_share_pdp&utm_medium=deeplink&utm_campaign=social_share_pdp_deeplink
+2025-04-19 13:06:55,105 - price_checker - INFO - Price check complete. Checked 4 products. Found 0 price changes.
+2025-04-19 18:41:30,065 - price_checker - INFO - Starting price check for all products
+2025-04-19 18:42:01,675 - price_checker - INFO - Price check complete. Checked 4 products. Found 0 price changes.
+2025-04-19 18:42:29,941 - price_checker - INFO - Starting price check for all products
+2025-04-19 18:42:58,733 - price_checker - INFO - Price check complete. Checked 4 products. Found 0 price changes.
+2025-04-19 18:50:17,792 - price_checker - INFO - Starting price check for all products
+2025-04-19 18:50:47,085 - price_checker - INFO - Price changed for Test Product - Old: 900, New: 850
+2025-04-19 18:50:47,111 - price_checker - INFO - Price check complete. Checked 4 products. Found 1 price changes.
