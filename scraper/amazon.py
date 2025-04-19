@@ -7,6 +7,7 @@ def get_amazon_price(url):
     options = Options()
     options.add_argument('--headless=new')  
     options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
 
     driver = webdriver.Chrome(options=options)  
     driver.get(url)
@@ -15,8 +16,11 @@ def get_amazon_price(url):
 
     try:
         title = driver.find_element(By.ID, "productTitle").text.strip()
-        price_str = driver.find_element(By.CLASS_NAME, "a-price-whole").text.replace(",", "")
-        price = int(price_str)
+        price_whole = driver.find_element(By.CLASS_NAME, "a-price-whole").text.replace(",", "")
+        price_fraction = driver.find_element(By.CLASS_NAME, "a-price-fraction").text
+        price = float(f"{price_whole}.{price_fraction}")
+
+        # price = int(price_str)
 
         return {
             "title": title,
