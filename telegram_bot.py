@@ -6,6 +6,8 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
+from db import add_or_update_product
+from price_checker import get_scraper_function  # Import the function that gets the appropriate scraper
 # Import your price checker functionality
 from price_checker import check_all_prices, check_price, products_collection
 
@@ -112,41 +114,85 @@ async def list_products(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     
     await update.message.reply_text(message)
 
+# In telegram_bot.py
+
+
 async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Add a new product to track."""
     args = context.args
     
-    if len(args) < 2:
+    if not args:
         await update.message.reply_text(
-            "Please provide a site name and URL.\n"
-            "Usage: /add_product [amazon|flipkart|myntra] [product_url]"
+            "Please provide a product URL.\n"
+            "Usage: /add_product [product_url]"
         )
         return
     
-    site = args[0].lower()
-    url = args[1]
+    url = args[0]
     user_id = str(update.effective_user.id)
     
-    # Check if site is supported
-    if site not in ["amazon", "flipkart", "myntra"]:
+    # Auto-detect site from URL
+    site = None
+    if "amazon" in url:
+        site = "amazon"
+    elif "flipkart" in url:
+        site = "flipkart"
+    elif "myntra" in url:
+        site = "myntra"
+    
+    if not site:
         await update.message.reply_text(
-            "Sorry, we only support Amazon, Flipkart, and Myntra at the moment."
+            "Sorry, I couldn't detect the site from the URL. We only support Amazon, Flipkart, and Myntra at the moment."
         )
         return
     
-    # Call your scraper functions to get initial product data
-    # This is a placeholder - you'll need to adapt this to your actual scraper logic
-    await update.message.reply_text(f"Adding product from {site.capitalize()}. Please wait...")
+    # Let the user know we're processing their request
+    await update.message.reply_text(f"Adding product from {site.capitalize()}. Please wait while I fetch the details...")
     
-    # For a complete implementation, you would need to:
-    # 1. Call the appropriate scraper function to get initial data
-    # 2. Store the product in your database
-    # 3. Return confirmation to the user
-    
-    await update.message.reply_text(
-        f"Product from {site.capitalize()} added successfully! I'll notify you of any price changes."
-    )
+    try:
+        # Get the appropriate scraper function
+        scraper_func = get_scraper_function(site)
+        if not scraper_func:
+            await update.message.reply_text(f"Sorry, I couldn't find a scraper for {site}.")
+            return
+        
+        # Fetch product details
+        product_data = scraper_func(url, user_id)
+        if not product_data or not product_data.get("price"):
+            await update.message.reply_text("Sorry, I couldn't fetch the product details. Please check the URL and try again.")
+            return
+        
+        # Add product to database
+        title = product_data.get("title", "Unknown Product")
+        price = product_data.get("price")
+        
+        add_or_update_product(user_id, url, site, title, price)
+        
+        # Success message
+        await update.message.reply_text(
+            f"Product added successfully!\n\n"
+            f"Title: {title}\n"
+            f"Current Price: ₹{price}\n"
+            f"Site: {site.capitalize()}\n\n"
+            f"I'll notify you when the price changes!"
+        )
+        
+    except Exception as e:
+        logger.error(f"Error adding product: {str(e)}")
+        await update.message.reply_text("Sorry, there was an error adding your product. Please try again later.")
 
+async def scheduled_check(context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Run scheduled price checks and notify subscribed users."""
+    logger.info("Running scheduled price check")
+    
+    # Use your existing price checking function
+    changes = check_all_prices()
+    
+    logger.info(f"Scheduled check complete. Found {changes} price changes.")
+    
+    # Note: The actual notifications are handled by your send_price_drop_alert function
+    # which is called from within check_price in your price_checker.py
+    
 async def delete_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Delete a product from tracking."""
     args = context.args
@@ -179,17 +225,6 @@ async def delete_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     except ValueError:
         await update.message.reply_text("Please provide a valid number.")
 
-async def scheduled_check(context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Run scheduled price checks and notify subscribed users."""
-    logger.info("Running scheduled price check")
-    
-    # Use your existing price checking function
-    changes = check_all_prices()
-    
-    logger.info(f"Scheduled check complete. Found {changes} price changes.")
-    
-    # Note: The actual notifications are handled by your send_price_drop_alert function
-    # which is called from within check_price in your price_checker.py
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send help info when the command /help is issued."""
@@ -201,7 +236,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 /unsubscribe - Unsubscribe from price alerts
 /check_all - Check prices for all products now
 /list_products - Show all your tracked products
-/add_product [site] [url] - Add a new product to track
+/add_product [url] - Add a new product to track
 /delete_product [number] - Remove a product from tracking
 /help - Show this help message
 
