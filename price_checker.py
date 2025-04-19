@@ -5,6 +5,7 @@ import sys
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
+from notifier import send_price_drop_alert
 
 # Import your scrapers
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -98,6 +99,7 @@ def check_price(product_doc):
                     }
                 }
             )
+            send_price_drop_alert(user_id,product_doc,new_price)
             return True  # Price changed
         else:
             print(f"No price change for {product_doc['title']}")

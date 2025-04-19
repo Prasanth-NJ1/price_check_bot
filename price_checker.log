@@ -30,3 +30,67 @@
 2025-04-19 18:50:17,792 - price_checker - INFO - Starting price check for all products
 2025-04-19 18:50:47,085 - price_checker - INFO - Price changed for Test Product - Old: 900, New: 850
 2025-04-19 18:50:47,111 - price_checker - INFO - Price check complete. Checked 4 products. Found 1 price changes.
+2025-04-19 19:09:57,707 - price_checker - INFO - Starting price check for all products
+2025-04-19 19:10:28,439 - price_checker - INFO - Price changed for Test Product - Old: 900, New: 850
+2025-04-19 19:10:32,585 - price_checker - INFO - Price check complete. Checked 4 products. Found 1 price changes.
+2025-04-19 19:14:48,509 - price_checker - INFO - Starting price check for all products
+2025-04-19 19:15:19,673 - price_checker - INFO - Price changed for Test Product - Old: 850, New: 800
+2025-04-19 19:15:20,715 - price_checker - INFO - Price check complete. Checked 4 products. Found 1 price changes.
+2025-04-19 19:30:34,781 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-04-19 19:30:34,781 - telegram_bot - INFO - Starting bot...
+2025-04-19 19:30:35,431 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getMe "HTTP/1.1 200 OK"
+2025-04-19 19:30:35,638 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/deleteWebhook "HTTP/1.1 200 OK"
+2025-04-19 19:30:35,641 - apscheduler.scheduler - INFO - Added job "scheduled_check" to job store "default"
+2025-04-19 19:30:35,641 - apscheduler.scheduler - INFO - Scheduler started
+2025-04-19 19:30:35,641 - telegram.ext.Application - INFO - Application started
+2025-04-19 19:30:36,190 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:30:36,507 - telegram_bot - INFO - New user registered: prasanth_nj (ID: 1400321755)
+2025-04-19 19:30:36,850 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/sendMessage "HTTP/1.1 200 OK"
+2025-04-19 19:30:44,789 - apscheduler.executors.default - INFO - Running job "scheduled_check (trigger: interval[6:00:00], next run at: 2025-04-19 20:00:44 UTC)" (scheduled at 2025-04-19 14:00:44.777574+00:00)
+2025-04-19 19:30:44,789 - telegram_bot - INFO - Running scheduled price check
+2025-04-19 19:30:44,789 - price_checker - INFO - Starting price check for all products
+2025-04-19 19:31:16,064 - price_checker - INFO - Price changed for Test Product - Old: 800, New: 750
+2025-04-19 19:31:16,670 - price_checker - INFO - Price check complete. Checked 4 products. Found 1 price changes.
+2025-04-19 19:31:16,671 - telegram_bot - INFO - Scheduled check complete. Found 1 price changes.
+2025-04-19 19:31:16,671 - apscheduler.executors.default - INFO - Job "scheduled_check (trigger: interval[6:00:00], next run at: 2025-04-19 20:00:44 UTC)" executed successfully
+2025-04-19 19:31:16,672 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:31:16,902 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:31:17,589 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/sendMessage "HTTP/1.1 200 OK"
+2025-04-19 19:31:17,617 - telegram_bot - INFO - User 1400321755 subscribed to price alerts
+2025-04-19 19:31:17,953 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/sendMessage "HTTP/1.1 200 OK"
+2025-04-19 19:31:27,092 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:31:37,279 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:31:47,449 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:31:57,626 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:32:07,798 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:32:17,970 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:32:24,650 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:32:24,651 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
+2025-04-19 19:32:24,652 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-04-19 19:32:24,652 - telegram.ext.Application - INFO - Application.stop() complete
+2025-04-19 19:34:00,629 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-04-19 19:34:00,629 - telegram_bot - INFO - Starting bot...
+2025-04-19 19:34:01,357 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getMe "HTTP/1.1 200 OK"
+2025-04-19 19:34:01,509 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/deleteWebhook "HTTP/1.1 200 OK"
+2025-04-19 19:34:01,511 - apscheduler.scheduler - INFO - Added job "scheduled_check" to job store "default"
+2025-04-19 19:34:01,511 - apscheduler.scheduler - INFO - Scheduler started
+2025-04-19 19:34:01,511 - telegram.ext.Application - INFO - Application started
+2025-04-19 19:34:10,648 - apscheduler.executors.default - INFO - Running job "scheduled_check (trigger: interval[6:00:00], next run at: 2025-04-19 20:04:10 UTC)" (scheduled at 2025-04-19 14:04:10.627662+00:00)
+2025-04-19 19:34:10,648 - telegram_bot - INFO - Running scheduled price check
+2025-04-19 19:34:10,649 - price_checker - INFO - Starting price check for all products
+2025-04-19 19:34:41,094 - price_checker - INFO - Price changed for Test Product - Old: 750, New: 700
+2025-04-19 19:34:42,301 - price_checker - INFO - Price check complete. Checked 4 products. Found 1 price changes.
+2025-04-19 19:34:42,301 - telegram_bot - INFO - Scheduled check complete. Found 1 price changes.
+2025-04-19 19:34:42,302 - apscheduler.executors.default - INFO - Job "scheduled_check (trigger: interval[6:00:00], next run at: 2025-04-19 20:04:10 UTC)" executed successfully
+2025-04-19 19:34:42,303 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:34:52,518 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:35:02,678 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:35:12,934 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:35:23,098 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:35:33,255 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:35:43,414 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:35:53,572 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:36:00,406 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-19 19:36:00,406 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
+2025-04-19 19:36:00,407 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-04-19 19:36:00,407 - telegram.ext.Application - INFO - Application.stop() complete

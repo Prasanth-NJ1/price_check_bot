@@ -3,3 +3,4 @@ beautifulsoup4
 requests
 pymongo
 apscheduler==3.10.1
+python-telegram-bot

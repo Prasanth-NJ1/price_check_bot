@@ -15,7 +15,7 @@ products = db["products"]
 def add_test_product():
     """Add a test product with initial price"""
     test_product = {
-        "user_id": 12345,
+        "user_id": 1400321755,
         "url": "https://www.amazon.in/test-product",
         "site": "amazon",
         "title": "Test Product",
