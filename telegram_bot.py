@@ -68,7 +68,7 @@ async def subscribe(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         upsert=True
     )
     logger.info(f"User {user_id} subscribed to price alerts")
-    await update.message.reply_text('You are now subscribed to price alerts! 🔔')
+    await update.message.reply_text('You are now subscribed to price alerts!')
 
 async def unsubscribe(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Unsubscribe user from price alerts."""
@@ -81,7 +81,7 @@ async def unsubscribe(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     
     if result.matched_count > 0:
         logger.info(f"User {user_id} unsubscribed from price alerts")
-        await update.message.reply_text('You have been unsubscribed from price alerts. 🔕')
+        await update.message.reply_text('You have been unsubscribed from price alerts.')
     else:
         await update.message.reply_text('You are not currently registered. Use /start first.')
 
@@ -106,7 +106,7 @@ async def list_products(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("You're not tracking any products yet.")
         return
     
-    message = "🛍️ Your tracked products:\n\n"
+    message = "Your tracked products:\n\n"
     for idx, product in enumerate(products_list, 1):
         message += f"{idx}. {product['title']}\n"
         message += f"   Current price: ₹{product['current_price']}\n"
@@ -120,7 +120,20 @@ async def list_products(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Add a new product to track."""
     args = context.args
+    user_id = str(update.effective_user.id)
+    username = update.effective_user.username or "user"
+    chat_id = update.effective_chat.id
     
+    if not users_collection.find_one({"user_id": int(user_id)}):
+        users_collection.insert_one({
+            "user_id": int(user_id),
+            "username": username,
+            "chat_id": chat_id,
+            "subscribed": True,
+            "created_at": asyncio.get_event_loop().time()
+        })
+        logger.info(f"New user registered via add_product: {username} (ID: {user_id})")
+        
     if not args:
         await update.message.reply_text(
             "Please provide a product URL.\n"
@@ -129,7 +142,7 @@ async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         return
     
     url = args[0]
-    user_id = str(update.effective_user.id)
+    
     
     # Auto-detect site from URL
     site = None
@@ -192,7 +205,7 @@ async def scheduled_check(context: ContextTypes.DEFAULT_TYPE) -> None:
     
     # Note: The actual notifications are handled by your send_price_drop_alert function
     # which is called from within check_price in your price_checker.py
-    
+
 async def delete_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Delete a product from tracking."""
     args = context.args

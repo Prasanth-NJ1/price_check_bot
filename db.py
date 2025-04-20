@@ -12,6 +12,9 @@ db = client["price_tracker_bot"]
 products = db["products"]
 
 def add_or_update_product(user_id, url, site, title, price):
+    
+    user_id = int(user_id) if isinstance(user_id, str) else user_id
+    
     now = datetime.utcnow()
     
     existing = products.find_one({"user_id": user_id, "url": url})
