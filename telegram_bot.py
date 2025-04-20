@@ -45,6 +45,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     if not site:
         # Not a supported product link
+        logger.info(f"Received message without recognized URL: {message_text[:30]}...")
         return
 
     # Let the user know we're processing it
@@ -52,11 +53,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # Call the same scraping logic
     try:
+        logger.info(f"Getting scraper function for site: {site}")
         scraper_func = get_scraper_function(site)
+        
+        if not scraper_func:
+            logger.error(f"No scraper function found for site: {site}")
+            await status.edit_text(f"❌ No scraper implementation found for {site.capitalize()}.")
+            return
+            
+        logger.info(f"Running scraper function for URL: {message_text[:50]}...")
         product_data = scraper_func(message_text, user_id)
+        logger.info(f"Scraper result: {product_data}")
 
-        if not product_data or not product_data.get("price"):
+        if not product_data:
             await status.edit_text("❌ Failed to fetch product details. Please check the link.")
+            return
+            
+        if not product_data.get("price"):
+            await status.edit_text("❌ Failed to extract price information. Please check the link.")
             return
         
         # Store the product
@@ -73,9 +87,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
 
     except Exception as e:
-        logger.error(f"Error handling message URL: {e}")
-        await status.edit_text("❌ Something went wrong. Please try again later.")
-
+        logger.error(f"Error handling message URL: {e}", exc_info=True)
+        await status.edit_text(f"❌ Error processing URL: {str(e)[:100]}...\nPlease try using the /addproduct command instead.")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a welcome message when the command /start is issued."""

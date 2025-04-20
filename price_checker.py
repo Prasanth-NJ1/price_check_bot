@@ -8,7 +8,7 @@ from pymongo import MongoClient
 from notifier import send_price_drop_alert
 
 # Import your scrapers
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from scraper.amazon import get_amazon_price  # Update with your actual function names
 from scraper.flipkart import get_flipkart_price
 from scraper.myntra import get_myntra_price
