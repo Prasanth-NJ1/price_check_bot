@@ -44,44 +44,61 @@
 
 # # Run the bot
 # CMD ["python", "telegram_bot.py"]
-FROM python:3.9-slim
+# Use official Python base image
+FROM python:3.10-slim
 
-# Install Chrome and dependencies
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Install required Linux packages for headless Chrome
 RUN apt-get update && apt-get install -y \
     wget \
     gnupg \
-    unzip \
     curl \
+    unzip \
     xvfb \
     libglib2.0-0 \
     libnss3 \
     libgconf-2-4 \
-    libfontconfig1
-
-# Install Chrome
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
-    && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list \
-    && apt-get update \
-    && apt-get install -y google-chrome-stable \
+    libfontconfig1 \
+    libxss1 \
+    libasound2 \
+    xdg-utils \
+    libatk-bridge2.0-0 \
+    libgtk-3-0 \
+    fonts-liberation \
+    libu2f-udev \
+    libvulkan1 \
+    chromium \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ChromeDriver
-RUN CHROME_VERSION=$(google-chrome --version | awk '{print $3}' | cut -d '.' -f 1) \
-    && CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_VERSION}") \
+# Set up ChromeDriver - ensuring version compatibility
+RUN CHROME_VERSION=$(chromium --version | grep -oP "Chromium \K[0-9]+") \
+    && CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") \
     && wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" \
-    && unzip chromedriver_linux64.zip -d /usr/bin/ \
-    && chmod +x /usr/bin/chromedriver \
+    && unzip chromedriver_linux64.zip \
+    && mv chromedriver /usr/local/bin/chromedriver \
+    && chmod +x /usr/local/bin/chromedriver \
     && rm chromedriver_linux64.zip
 
-# Create app directory
+# Set workdir
 WORKDIR /app
 
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt /app/
+
 # Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir webdriver-manager selenium
 
-# Copy application code
-COPY . .
+# Copy your app files
+COPY . /app
 
-# Command to run the application
+# Set environment for Selenium
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
+
+# Run the bot
 CMD ["python", "telegram_bot.py"]

@@ -282,9 +282,9 @@ def get_amazon_price(url, user_id):
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
 
-    # For Docker environment, use this approach
-    driver = webdriver.Chrome(options=options)
-    
+
+    service = Service('/usr/bin/chromedriver')  # Path to chromedriver in your Docker container
+    driver = webdriver.Chrome(service=service, options=options)
     result = {"title": "Title not found", "price": None}
     
     try:
