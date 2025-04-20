@@ -1,8 +1,8 @@
-selenium
+selenium>=4.0.0
 beautifulsoup4
 requests
 pymongo
 apscheduler==3.10.1
-python-telegram-bot
+python-telegram-bot>=13.0
 python-dotenv
 webdriver_manager

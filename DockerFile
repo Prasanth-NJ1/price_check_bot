@@ -45,6 +45,7 @@
 # # Run the bot
 # CMD ["python", "telegram_bot.py"]
 # Use official Python base image
+# Use official Python base image
 FROM python:3.10-slim
 
 # Set environment variables
@@ -57,10 +58,11 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     curl \
     unzip \
+    chromium \
+    chromium-driver \
     xvfb \
     libglib2.0-0 \
     libnss3 \
-    libgconf-2-4 \
     libfontconfig1 \
     libxss1 \
     libasound2 \
@@ -69,18 +71,12 @@ RUN apt-get update && apt-get install -y \
     libgtk-3-0 \
     fonts-liberation \
     libu2f-udev \
-    libvulkan1 \
-    chromium \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up ChromeDriver - ensuring version compatibility
-RUN CHROME_VERSION=$(chromium --version | grep -oP "Chromium \K[0-9]+") \
-    && CHROMEDRIVER_VERSION=$(curl -s "https://chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROME_VERSION") \
-    && wget -q "https://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip" \
-    && unzip chromedriver_linux64.zip \
-    && mv chromedriver /usr/local/bin/chromedriver \
-    && chmod +x /usr/local/bin/chromedriver \
-    && rm chromedriver_linux64.zip
+# Verify chromedriver installation and make it executable
+RUN ls -la /usr/bin/chromedriver && \
+    chmod +x /usr/bin/chromedriver && \
+    chromedriver --version
 
 # Set workdir
 WORKDIR /app
@@ -90,15 +86,14 @@ COPY requirements.txt /app/
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir -r requirements.txt \
-    && pip install --no-cache-dir webdriver-manager selenium
+    && pip install --no-cache-dir -r requirements.txt
 
 # Copy your app files
 COPY . /app
 
 # Set environment for Selenium
 ENV CHROME_BIN=/usr/bin/chromium
-ENV CHROMEDRIVER_PATH=/usr/local/bin/chromedriver
+ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 
 # Run the bot
 CMD ["python", "telegram_bot.py"]
