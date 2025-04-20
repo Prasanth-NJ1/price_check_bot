@@ -53,25 +53,30 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # Call the same scraping logic
     try:
-        logger.info(f"Getting scraper function for site: {site}")
+    # Get the appropriate scraper function
         scraper_func = get_scraper_function(site)
-        
         if not scraper_func:
-            logger.error(f"No scraper function found for site: {site}")
-            await status.edit_text(f"❌ No scraper implementation found for {site.capitalize()}.")
+            await status.edit_text(f"❌ Sorry, I couldn't find a scraper for {site}.")
             return
-            
-        logger.info(f"Running scraper function for URL: {message_text[:50]}...")
+        
+        # Fetch product details
+        logger.info(f"Fetching product details for {message_text}")
         product_data = scraper_func(message_text, user_id)
         logger.info(f"Scraper result: {product_data}")
-
-        if not product_data:
-            await status.edit_text("❌ Failed to fetch product details. Please check the link.")
+    
+        if not product_data or not product_data.get("price"):
+            logger.error(f"Failed to fetch product details for {message_text}. Product data: {product_data}")
+            await status.edit_text(
+                "❌ I couldn't fetch the product details.\n\n"
+                "This could be because:\n"
+                "• The URL format is incorrect\n"
+                "• The product page structure changed\n"
+                "• The site is blocking our request\n\n"
+                "Please check the URL and try again."
+            )
             return
-            
-        if not product_data.get("price"):
-            await status.edit_text("❌ Failed to extract price information. Please check the link.")
-            return
+    
+    # Rest of the function...
         
         # Store the product
         title = product_data["title"]
@@ -311,7 +316,7 @@ async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
     
     # Auto-detect site from URL
     site = None
-    if "amazon" in url:
+    if "amazon" in url or "amzn.in" in url:
         site = "amazon"
     elif "flipkart" in url:
         site = "flipkart"
