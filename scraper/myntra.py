@@ -21,8 +21,10 @@ def get_myntra_price(url,user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
+    options.binary_location = "/usr/bin/chromium"
     
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+    service= Service("/usr/bin/chromedriver")    
+    driver = webdriver.Chrome(service=service, options=options)
     # driver = webdriver.Chrome(options=options)
     result = {"title": "Title not found", "price": None, "mrp": None, "discount": None}
     
