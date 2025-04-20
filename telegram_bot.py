@@ -348,8 +348,29 @@ async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
             await status_message.edit_text(f"❌ Sorry, I couldn't find a scraper for {site}.")
             return
         
-        # Fetch product details
-        product_data = scraper_func(url, user_id)
+        # Fetch product details with better error handling
+        try:
+            product_data = scraper_func(url, user_id)
+        except Exception as scraper_error:
+            error_msg = str(scraper_error)
+            logger.error(f"Scraper error: {error_msg}", exc_info=True)
+            
+            if "chromedriver unexpectedly exited" in error_msg:
+                await status_message.edit_text(
+                    "❌ There was a problem with the web browser component.\n\n"
+                    "This is a server-side issue. Please try again later."
+                )
+            else:
+                await status_message.edit_text(
+                    "❌ Sorry, there was an error adding your product.\n\n"
+                    "Please check that:\n"
+                    "• The URL is correct\n"
+                    "• The site is supported\n"
+                    "• The product is available\n\n"
+                    "Try again later or contact support if the issue persists."
+                )
+            return
+            
         if not product_data or not product_data.get("price"):
             await status_message.edit_text(
                 "❌ I couldn't fetch the product details.\n\n"
