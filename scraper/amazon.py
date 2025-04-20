@@ -42,20 +42,18 @@
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from webdriver_manager.chrome import ChromeDriverManager
+
 import re
 import time
 import sys
 import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from db import add_or_update_product
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-import shutil
-print("🕵️ Chromium:", shutil.which("chromium") or shutil.which("chromium-browser"))
-print("🕵️ Chromedriver:", shutil.which("chromedriver"))
 
 def get_amazon_price(url, user_id):
     options = Options()
@@ -65,10 +63,11 @@ def get_amazon_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-    options.binary_location = "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe"
 
-    service = Service(ChromeDriverManager().install())    
+    # Automatically manage chromedriver
+    service = Service(ChromeDriverManager().install())
     driver = webdriver.Chrome(service=service, options=options)
+
     # driver = webdriver.Chrome(options=options)
     result = {"title": "Title not found", "price": None}
     

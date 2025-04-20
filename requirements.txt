@@ -5,4 +5,4 @@ pymongo
 apscheduler==3.10.1
 python-telegram-bot
 python-dotenv
-webdriver-manager
+webdriver_manager
