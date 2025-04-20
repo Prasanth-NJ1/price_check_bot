@@ -7,8 +7,7 @@ from dotenv import load_dotenv
 from pymongo import MongoClient
 
 from db import add_or_update_product
-from price_checker import get_scraper_function  # Import the function that gets the appropriate scraper
-# Import your price checker functionality
+from price_checker import get_scraper_function 
 from price_checker import check_all_prices, check_price, products_collection
 
 # Configure logging
@@ -28,6 +27,55 @@ MONGO_URI = os.getenv("MONGO_URI")
 client = MongoClient(MONGO_URI)
 db = client["price_tracker_bot"]
 users_collection = db["users"]  # Collection to store user subscription info
+
+
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle messages that contain a supported product URL (without using /addproduct)."""
+    message_text = update.message.text
+    user_id = str(update.effective_user.id)
+    
+    # Detect which site it is from
+    site = None
+    if "amazon" in message_text:
+        site = "amazon"
+    elif "flipkart" in message_text:
+        site = "flipkart"
+    elif "myntra" in message_text:
+        site = "myntra"
+    
+    if not site:
+        # Not a supported product link
+        return
+
+    # Let the user know we're processing it
+    status = await update.message.reply_text(f"🔍 Processing your {site.capitalize()} link...")
+
+    # Call the same scraping logic
+    try:
+        scraper_func = get_scraper_function(site)
+        product_data = scraper_func(message_text, user_id)
+
+        if not product_data or not product_data.get("price"):
+            await status.edit_text("❌ Failed to fetch product details. Please check the link.")
+            return
+        
+        # Store the product
+        title = product_data["title"]
+        price = product_data["price"]
+        add_or_update_product(user_id, message_text, site, title, price)
+
+        await status.edit_text(
+            f"✅ *Product added successfully!*\n\n"
+            f"📦 *{title}*\n"
+            f"💰 Price: ₹{price}\n"
+            f"🏪 Site: {site.capitalize()}",
+            parse_mode='Markdown'
+        )
+
+    except Exception as e:
+        logger.error(f"Error handling message URL: {e}")
+        await status.edit_text("❌ Something went wrong. Please try again later.")
+
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a welcome message when the command /start is issued."""
@@ -471,6 +519,7 @@ def main() -> None:
     # Start the Bot
     logger.info("Starting bot...")
     print("Starting Price Tracker Bot...")
+    application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
     application.run_polling()
 
 if __name__ == '__main__':
