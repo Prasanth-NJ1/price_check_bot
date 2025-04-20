@@ -268,3 +268,189 @@
 2025-04-19 20:12:53,887 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
 2025-04-19 20:12:53,888 - apscheduler.scheduler - INFO - Scheduler has been shut down
 2025-04-19 20:12:53,888 - telegram.ext.Application - INFO - Application.stop() complete
+2025-04-20 10:36:16,543 - apscheduler.scheduler - INFO - Adding job tentatively -- it will be properly scheduled when the scheduler starts
+2025-04-20 10:36:16,544 - telegram_bot - INFO - Starting bot...
+2025-04-20 10:36:17,059 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getMe "HTTP/1.1 200 OK"
+2025-04-20 10:36:17,219 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/deleteWebhook "HTTP/1.1 200 OK"
+2025-04-20 10:36:17,222 - apscheduler.scheduler - INFO - Added job "scheduled_check" to job store "default"
+2025-04-20 10:36:17,222 - apscheduler.scheduler - INFO - Scheduler started
+2025-04-20 10:36:17,222 - telegram.ext.Application - INFO - Application started
+2025-04-20 10:36:21,885 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 409 Conflict"
+2025-04-20 10:36:21,886 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 115, in network_retry_loop
+    if not await do_action():
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 108, in do_action
+    return action_cb_task.result()
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_updater.py", line 335, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 658, in get_updates
+    updates = await super().get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 4593, in get_updates
+    await self._post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 362, in _do_post
+    return await super()._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 355, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-04-20 10:36:26,554 - apscheduler.executors.default - INFO - Running job "scheduled_check (trigger: interval[6:00:00], next run at: 2025-04-20 11:06:26 UTC)" (scheduled at 2025-04-20 05:06:26.542240+00:00)
+2025-04-20 10:36:26,554 - telegram_bot - INFO - Running scheduled price check
+2025-04-20 10:36:26,555 - price_checker - INFO - Starting price check for all products
+2025-04-20 10:36:55,376 - price_checker - INFO - Price changed for Test Product - Old: 550, New: 500
+2025-04-20 10:36:56,656 - price_checker - INFO - Price check complete. Checked 4 products. Found 1 price changes.
+2025-04-20 10:36:56,657 - telegram_bot - INFO - Scheduled check complete. Found 1 price changes.
+2025-04-20 10:36:56,657 - apscheduler.executors.default - INFO - Job "scheduled_check (trigger: interval[6:00:00], next run at: 2025-04-20 11:06:26 UTC)" executed successfully
+2025-04-20 10:36:56,658 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 409 Conflict"
+2025-04-20 10:36:56,658 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 115, in network_retry_loop
+    if not await do_action():
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 108, in do_action
+    return action_cb_task.result()
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_updater.py", line 335, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 658, in get_updates
+    updates = await super().get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 4593, in get_updates
+    await self._post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 362, in _do_post
+    return await super()._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 355, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-04-20 10:37:02,509 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 409 Conflict"
+2025-04-20 10:37:02,510 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 115, in network_retry_loop
+    if not await do_action():
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 108, in do_action
+    return action_cb_task.result()
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_updater.py", line 335, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 658, in get_updates
+    updates = await super().get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 4593, in get_updates
+    await self._post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 362, in _do_post
+    return await super()._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 355, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-04-20 10:37:09,606 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 409 Conflict"
+2025-04-20 10:37:09,608 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 115, in network_retry_loop
+    if not await do_action():
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 108, in do_action
+    return action_cb_task.result()
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_updater.py", line 335, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 658, in get_updates
+    updates = await super().get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 4593, in get_updates
+    await self._post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 362, in _do_post
+    return await super()._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 355, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-04-20 10:37:18,577 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 409 Conflict"
+2025-04-20 10:37:18,578 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 115, in network_retry_loop
+    if not await do_action():
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 108, in do_action
+    return action_cb_task.result()
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_updater.py", line 335, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 658, in get_updates
+    updates = await super().get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 4593, in get_updates
+    await self._post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 362, in _do_post
+    return await super()._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 355, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-04-20 10:37:27,667 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 409 Conflict"
+2025-04-20 10:37:27,669 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 115, in network_retry_loop
+    if not await do_action():
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 108, in do_action
+    return action_cb_task.result()
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_updater.py", line 335, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 658, in get_updates
+    updates = await super().get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 4593, in get_updates
+    await self._post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 362, in _do_post
+    return await super()._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 355, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-04-20 10:37:41,394 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 409 Conflict"
+2025-04-20 10:37:41,395 - telegram.ext.Application - ERROR - No error handlers are registered, logging exception.
+Traceback (most recent call last):
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 115, in network_retry_loop
+    if not await do_action():
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_utils\networkloop.py", line 108, in do_action
+    return action_cb_task.result()
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_updater.py", line 335, in polling_action_cb
+    updates = await self.bot.get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 658, in get_updates
+    updates = await super().get_updates(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 4593, in get_updates
+    await self._post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\ext\_extbot.py", line 362, in _do_post
+    return await super()._do_post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+  File "C:\Users\prasa\price_alert_bot\venv\lib\site-packages\telegram\request\_baserequest.py", line 355, in _request_wrapper
+    raise Conflict(message)
+telegram.error.Conflict: Conflict: terminated by other getUpdates request; make sure that only one bot instance is running
+2025-04-20 10:37:53,248 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7624531851:AAGX0wdfV-i5JU2-ug1jrABZJKSYRNVHCcg/getUpdates "HTTP/1.1 200 OK"
+2025-04-20 10:37:53,249 - telegram.ext.Application - INFO - Application is stopping. This might take a moment.
+2025-04-20 10:37:53,250 - apscheduler.scheduler - INFO - Scheduler has been shut down
+2025-04-20 10:37:53,250 - telegram.ext.Application - INFO - Application.stop() complete
