@@ -13,6 +13,9 @@ from db import add_or_update_product
 from selenium.webdriver.chrome.service import Service
 
 
+import platform
+import shutil
+
 def get_flipkart_price(url, user_id):
     options = Options()
     options.add_argument('--headless=new')
@@ -21,13 +24,30 @@ def get_flipkart_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-    chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
+
+    # Detect if running on Windows or Linux (Railway)
+    if platform.system() == "Windows":
+        chrome_binary = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+        chromedriver_path = r"C:\Users\prasa\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe"
+    else:
+        chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
+        chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
+
+    # Logging (useful for both local + Railway)
+    print("CHROME_BIN:", chrome_binary)
+    print("CHROMEDRIVER_PATH:", chromedriver_path)
+    print("Exists:", os.path.exists(chromedriver_path))
+    print("Executable:", os.access(chromedriver_path, os.X_OK))
+    print("Which chromedriver:", shutil.which("chromedriver"))
+    print("Which chromium:", shutil.which("chromium"))
+
+    # 🔧 Use the correct binary
     options.binary_location = chrome_binary
-    chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
     service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=options)
+
     result = {"title": "Title not found", "price": None}
-    
+
     try:
         print(f"Accessing URL: {url}")
         driver.get(url)

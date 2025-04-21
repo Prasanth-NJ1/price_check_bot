@@ -268,6 +268,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
+import shutil
+import platform
 import re
 import time
 import sys
@@ -283,11 +285,28 @@ def get_amazon_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-    chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
+
+    # 🧠 Cross-platform Chrome/Chromedriver setup
+    if platform.system() == "Windows":
+        chrome_binary = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+        chromedriver_path = r"C:\Users\prasa\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe"
+    else:
+        chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
+        chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
+
+    # Debug output (optional but helpful)
+    print("CHROME_BIN:", chrome_binary)
+    print("CHROMEDRIVER_PATH:", chromedriver_path)
+    print("Exists:", os.path.exists(chromedriver_path))
+    print("Executable:", os.access(chromedriver_path, os.X_OK))
+    print("Which chromedriver:", shutil.which("chromedriver"))
+    print("Which chromium:", shutil.which("chromium"))
+
+    # Set the Chrome binary and start the driver
     options.binary_location = chrome_binary
-    chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
     service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=options)
+
     result = {"title": "Title not found", "price": None}
     
     try:
