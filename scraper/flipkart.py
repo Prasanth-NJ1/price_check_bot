@@ -31,27 +31,39 @@ def get_flipkart_price(url, user_id):
         chromedriver_path = r"C:\Users\prasa\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe"
     else:
         chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
-        chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
+        chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "chromedriver")  # Let PATH resolve it if needed
 
     # Logging (useful for both local + Railway)
     print("CHROME_BIN:", chrome_binary)
     print("CHROMEDRIVER_PATH:", chromedriver_path)
-    print("Exists:", os.path.exists(chromedriver_path))
-    print("Executable:", os.access(chromedriver_path, os.X_OK))
-    print("Which chromedriver:", shutil.which("chromedriver"))
-    print("Which chromium:", shutil.which("chromium"))
 
-    # 🔧 Use the correct binary
+    # Use the correct binary
     options.binary_location = chrome_binary
-    service = Service(chromedriver_path)
-    driver = webdriver.Chrome(service=service, options=options)
-
+    
     result = {"title": "Title not found", "price": None}
+    driver = None
 
     try:
+        # Try with explicit path first
+        try:
+            service = Service(chromedriver_path)
+            driver = webdriver.Chrome(service=service, options=options)
+        except Exception as driver_error:
+            print(f"Failed to initialize Chrome with explicit path: {str(driver_error)}")
+            # Fall back to letting Selenium find chromedriver in PATH
+            try:
+                service = Service()
+                driver = webdriver.Chrome(service=service, options=options)
+            except Exception as fallback_error:
+                print(f"Failed to initialize Chrome with PATH: {str(fallback_error)}")
+                # One more attempt with just the binary name
+                service = Service("chromedriver")
+                driver = webdriver.Chrome(service=service, options=options)
+
         print(f"Accessing URL: {url}")
         driver.get(url)
 
+        # Rest of your scraping code remains the same...
         time.sleep(3)
         try:
             meta_tag = WebDriverWait(driver, 10).until(
@@ -189,7 +201,8 @@ def get_flipkart_price(url, user_id):
     except Exception as e:
         print(f"Error in scraping: {str(e)[:80]}")
     finally:
-        driver.quit()
+        if driver:
+            driver.quit()
 
     if result["title"] != "Title not found" and result["price"] is not None:
         try:
@@ -198,7 +211,6 @@ def get_flipkart_price(url, user_id):
         except Exception as db_error:
             print(f"[DB ERROR] Failed to save to MongoDB: {db_error}")
 
-    
     return result
 
 # Example usage
