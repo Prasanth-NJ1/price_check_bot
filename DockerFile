@@ -122,13 +122,72 @@
 
 # # Run the bot
 # CMD ["python", "telegram_bot.py"]
+# FROM python:3.10-slim
+
+# # Set environment variables
+# ENV PYTHONDONTWRITEBYTECODE=1
+# ENV PYTHONUNBUFFERED=1
+
+# # Install dependencies + Chrome + ChromeDriver
+# RUN apt-get update && apt-get install -y --no-install-recommends \
+#     wget \
+#     unzip \
+#     curl \
+#     fonts-liberation \
+#     libglib2.0-0 \
+#     libnss3 \
+#     libxss1 \
+#     libasound2 \
+#     libatk-bridge2.0-0 \
+#     libgtk-3-0 \
+#     libu2f-udev \
+#     libgbm1 \
+#     libdrm2 \
+#     xdg-utils \
+#     libfontconfig1 && \
+#     rm -rf /var/lib/apt/lists/*
+
+# # Install specific Chrome and Chromedriver versions
+# ENV CHROME_VERSION=119.0.6045.105
+
+# RUN wget -O chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
+#     wget -O chromedriver-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
+#     unzip chrome-linux64.zip && \
+#     unzip chromedriver-linux64.zip && \
+#     mv chrome-linux64 /opt/chrome && \
+#     mv chromedriver-linux64/chromedriver /usr/bin/chromedriver && \
+#     chmod +x /usr/bin/chromedriver && \
+#     ln -s /opt/chrome/chrome /usr/bin/chromium && \
+#     ln -s /opt/chrome/chrome /usr/bin/google-chrome && \
+#     rm -rf *.zip chrome-linux64 chromedriver-linux64
+
+# # Debug install
+# RUN chromium --version && chromedriver --version && which chromedriver
+
+# # Set environment variables for selenium
+# ENV CHROME_BIN=/usr/bin/chromium
+# ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
+
+# # Set working directory
+# WORKDIR /app
+
+# # Install Python requirements
+# COPY requirements.txt ./
+# RUN pip install --no-cache-dir -r requirements.txt
+
+# # Copy the app
+# COPY . .
+
+# # Run the bot
+# CMD ["python", "telegram_bot.py"]
+
 FROM python:3.10-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install dependencies + Chrome + ChromeDriver
+# Install system dependencies for Chrome + Selenium
 RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     unzip \
@@ -144,14 +203,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgbm1 \
     libdrm2 \
     xdg-utils \
-    libfontconfig1 && \
-    rm -rf /var/lib/apt/lists/*
+    libfontconfig1 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install specific Chrome and Chromedriver versions
+# Install specific Chrome + Chromedriver (Chrome for Testing)
 ENV CHROME_VERSION=119.0.6045.105
 
-RUN wget -O chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
-    wget -O chromedriver-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
+RUN wget -q -O chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
+    wget -q -O chromedriver-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
     unzip chrome-linux64.zip && \
     unzip chromedriver-linux64.zip && \
     mv chrome-linux64 /opt/chrome && \
@@ -159,24 +219,25 @@ RUN wget -O chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing
     chmod +x /usr/bin/chromedriver && \
     ln -s /opt/chrome/chrome /usr/bin/chromium && \
     ln -s /opt/chrome/chrome /usr/bin/google-chrome && \
-    rm -rf *.zip chrome-linux64 chromedriver-linux64
+    rm -rf *.zip chromedriver-linux64 chrome-linux64
 
-# Debug install
+# Debug install info
 RUN chromium --version && chromedriver --version && which chromedriver
 
-# Set environment variables for selenium
+# Set environment vars for Selenium
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 
 # Set working directory
 WORKDIR /app
 
-# Install Python requirements
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+# Install Python dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && pip install --no-cache-dir -r requirements.txt
 
-# Copy the app
+# Copy app source code
 COPY . .
 
-# Run the bot
+# Start the Telegram bot
 CMD ["python", "telegram_bot.py"]
+

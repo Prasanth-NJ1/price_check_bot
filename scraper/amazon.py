@@ -228,3 +228,10 @@ def get_amazon_price(url, user_id):
     
     # Don't save to database here - let the caller handle that
     return result
+
+if __name__ == "__main__":
+    url = "https://amzn.in/d/ezSvsED"  # or another Amazon link
+    user_id = "123"
+    result = get_amazon_price(url, user_id)
+    print("\n🔍 Final Result:")
+    print(result)
