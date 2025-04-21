@@ -17,6 +17,15 @@ import platform
 import shutil
 
 def get_flipkart_price(url, user_id):
+    # Cross-platform binary/driver paths
+    if platform.system() == "Windows":
+        chrome_binary = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+        chromedriver_path = r"C:\Users\prasa\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe"
+    else:
+        chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
+        chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
+
+    # Setup options
     options = Options()
     options.add_argument('--headless=new')
     options.add_argument('--disable-gpu')
@@ -24,51 +33,47 @@ def get_flipkart_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-    options.set_capability("browserName", "chrome")
-    # Detect if running on Windows or Linux (Railway)
-    if platform.system() == "Windows":
-        chrome_binary = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
-        chromedriver_path = r"C:\Users\prasa\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe"
-    else:
-        chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
-        chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "chromedriver")  # Let PATH resolve it if needed
 
-    # Logging (useful for both local + Railway)
+    # ✅ Important: tell Selenium explicitly where the binary is
+    options.set_capability("goog:chromeOptions", {
+        "binary": chrome_binary,
+        "args": options.arguments
+    })
+
+    # Debug info
     print("CHROME_BIN:", chrome_binary)
     print("CHROMEDRIVER_PATH:", chromedriver_path)
 
-    # Use the correct binary
-    options.binary_location = chrome_binary
-    
     result = {"title": "Title not found", "price": None}
     driver = None
 
     try:
-        # Try with explicit path first
+        # Try multiple initialization paths
         try:
-            print("Trying Explicit chromedriver")
+            print("Trying explicit chromedriver...")
             service = Service(chromedriver_path)
             driver = webdriver.Chrome(service=service, options=options)
         except Exception as driver_error:
-            print(f"Failed to initialize Chrome with explicit path: {str(driver_error)}")
-            # Fall back to letting Selenium find chromedriver in PATH
+            print(f"❌ Failed with explicit path: {str(driver_error)}")
             try:
-                print("Trying with default PATH")
+                print("Trying with default PATH...")
                 service = Service()
                 driver = webdriver.Chrome(service=service, options=options)
             except Exception as fallback_error:
-                print(f"Failed to initialize Chrome with PATH: {str(fallback_error)}")
-                print("Trying with final PATH")
-                # One more attempt with just the binary name
+                print(f"❌ Failed with PATH: {str(fallback_error)}")
+                print("Trying with final fallback...")
                 service = Service("chromedriver")
                 driver = webdriver.Chrome(service=service, options=options)
 
-        print(f"Accessing URL: {url}")
+        print(f"🌐 Accessing URL: {url}")
         driver.get(url)
+        time.sleep(3)
+
         with open("page_debug.html", "w", encoding="utf-8") as f:
             f.write(driver.page_source)
         print("📝 Saved page source to 'page_debug.html'")
 
+        # Continue with scraping logic here...
 
         # Rest of your scraping code remains the same...
         time.sleep(3)
