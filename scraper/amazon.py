@@ -286,6 +286,7 @@ def get_amazon_price(url, user_id):
     chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
     options.binary_location = chrome_binary
     chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
+    os.environ["webdriver.chrome.driver"] = chromedriver_path
     service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=options)
     result = {"title": "Title not found", "price": None}
