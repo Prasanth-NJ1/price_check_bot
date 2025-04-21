@@ -1,51 +1,63 @@
-# # Use official Python base image
+
 # FROM python:3.10-slim
 
 # # Set environment variables
-# ENV PYTHONDONTWRITEBYTECODE 1
-# ENV PYTHONUNBUFFERED 1
+# ENV PYTHONDONTWRITEBYTECODE=1
+# ENV PYTHONUNBUFFERED=1
 
 # # Install required Linux packages for headless Chrome
+# # Install Chromium and Chromedriver manually (from Chrome for Testing)
 # RUN apt-get update && apt-get install -y \
 #     wget \
 #     unzip \
 #     curl \
-#     gnupg \
 #     libglib2.0-0 \
 #     libnss3 \
-#     libgconf-2-4 \
-#     libfontconfig1 \
 #     libxss1 \
-#     libappindicator3-1 \
 #     libasound2 \
-#     xdg-utils \
 #     libatk-bridge2.0-0 \
 #     libgtk-3-0 \
-#     fonts-liberation \
 #     libu2f-udev \
-#     libvulkan1 \
-#     chromium \
-#     chromium-driver \
-#     && rm -rf /var/lib/apt/lists/*
+#     xdg-utils \
+#     fonts-liberation \
+#     libfontconfig1 && \
+#     CHROME_VERSION=135.0.7049.96 && \
+#     wget -q https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux/x64/chrome-linux64.zip && \
+#     wget -q https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux/x64/chromedriver-linux64.zip && \
+#     unzip chrome-linux64.zip && \
+#     unzip chromedriver-linux64.zip && \
+#     mv chrome-linux64 /opt/chrome && \
+#     mv chromedriver-linux64/chromedriver /usr/bin/chromedriver && \
+#     chmod +x /usr/bin/chromedriver && \
+#     ln -s /opt/chrome/chrome /usr/bin/chromium
+
+# # Verify chromedriver installation and make it executable
+# RUN ls -la /usr/bin/chromedriver && \
+#     chmod +x /usr/bin/chromedriver && \
+#     chromedriver --version && \
+#     ln -s /usr/bin/chromium /usr/bin/google-chrome
 
 # # Set workdir
 # WORKDIR /app
 
-# # Copy your app files
-# COPY . /app
+# # Copy requirements first to leverage Docker cache
+# COPY requirements.txt /app/
 
 # # Install Python dependencies
-# RUN pip install --upgrade pip
-# RUN pip install -r requirements.txt
+# RUN pip install --no-cache-dir --upgrade pip \
+#     && pip install --no-cache-dir -r requirements.txt
+
+# # Copy your app files
+# COPY . /app
 
 # # Set environment for Selenium
 # ENV CHROME_BIN=/usr/bin/chromium
 # ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 
+# RUN chromium --version && chromedriver --version
+
 # # Run the bot
 # CMD ["python", "telegram_bot.py"]
-# Use official Python base image
-# Use official Python base image
 
 FROM python:3.10-slim
 
@@ -53,33 +65,49 @@ FROM python:3.10-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Install required Linux packages for headless Chrome
-RUN apt-get update && apt-get install -y \
+# Install required libraries for Chrome to work headless
+RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
-    gnupg \
-    curl \
     unzip \
-    chromium \
-    chromium-driver \
-    xvfb \
+    curl \
+    gnupg \
     libglib2.0-0 \
     libnss3 \
-    libfontconfig1 \
     libxss1 \
+    libdrm2 \
+    libgbm1 \
     libasound2 \
-    xdg-utils \
     libatk-bridge2.0-0 \
     libgtk-3-0 \
-    fonts-liberation \
     libu2f-udev \
-    && rm -rf /var/lib/apt/lists/*
+    xdg-utils \
+    fonts-liberation \
+    libfontconfig1 && \
+    rm -rf /var/lib/apt/lists/*
 
-# Verify chromedriver installation and make it executable
-RUN ls -la /usr/bin/chromedriver && \
+
+# Set Chrome version
+ENV CHROME_VERSION=119.0.6045.105
+
+RUN wget -O chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
+    wget -O chromedriver-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
+    unzip chrome-linux64.zip && \
+    unzip chromedriver-linux64.zip && \
+    mv chrome-linux64 /opt/chrome && \
+    mv chromedriver-linux64/chromedriver /usr/bin/chromedriver && \
     chmod +x /usr/bin/chromedriver && \
-    chromedriver --version && \
-    ln -s /usr/bin/chromium /usr/bin/google-chrome
-    
+    ln -s /opt/chrome/chrome /usr/bin/chromium && \
+    ln -s /opt/chrome/chrome /usr/bin/google-chrome && \
+    rm -rf *.zip chrome-linux64 chromedriver-linux64
+
+
+# Set environment for Selenium
+ENV CHROME_BIN=/usr/bin/chromium
+ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
+
+# Verify installs
+RUN chromium --version && chromedriver --version && ls -la /usr/bin/chromedriver
+
 # Set workdir
 WORKDIR /app
 
@@ -92,12 +120,6 @@ RUN pip install --no-cache-dir --upgrade pip \
 
 # Copy your app files
 COPY . /app
-
-# Set environment for Selenium
-ENV CHROME_BIN=/usr/bin/chromium
-ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
-
-RUN chromium --version && chromedriver --version
 
 # Run the bot
 CMD ["python", "telegram_bot.py"]
