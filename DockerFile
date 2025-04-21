@@ -95,5 +95,7 @@ COPY . /app
 ENV CHROME_BIN=/usr/bin/chromium
 ENV CHROMEDRIVER_PATH=/usr/bin/chromedriver
 
+RUN chromium --version && chromedriver --version
+
 # Run the bot
 CMD ["python", "telegram_bot.py"]
