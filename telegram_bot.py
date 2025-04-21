@@ -28,6 +28,13 @@ client = MongoClient(MONGO_URI)
 db = client["price_tracker_bot"]
 users_collection = db["users"]  # Collection to store user subscription info
 
+print("✅ Telegram bot starting...")
+
+import time
+print("🕒 Time:", time.time())
+
+import platform
+print("🖥️ Platform:", platform.system())
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle messages that contain a supported product URL (without using /addproduct)."""

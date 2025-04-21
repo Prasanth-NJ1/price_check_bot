@@ -33,7 +33,7 @@ def get_flipkart_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-
+    options.set_capability("browserName", "chrome")
     # ✅ Important: tell Selenium explicitly where the binary is
     options.set_capability("goog:chromeOptions", {
         "binary": chrome_binary,
@@ -73,9 +73,7 @@ def get_flipkart_price(url, user_id):
             f.write(driver.page_source)
         print("📝 Saved page source to 'page_debug.html'")
 
-        # Continue with scraping logic here...
 
-        # Rest of your scraping code remains the same...
         time.sleep(3)
         try:
             meta_tag = WebDriverWait(driver, 10).until(
