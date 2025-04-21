@@ -56,7 +56,6 @@ def get_amazon_price(url, user_id):
         print(f"Accessing URL: {url}")
         driver.get(url)
         
-        # Rest of your scraping code stays the same...
         
         # Wait for page to load
         time.sleep(3)

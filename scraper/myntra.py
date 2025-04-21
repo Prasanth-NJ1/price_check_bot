@@ -234,6 +234,7 @@ def get_myntra_price(url, user_id):
                 print(f"[DB ERROR] Failed to save to MongoDB: {db_error}")
 
     return result
+
 # Example usage
 if __name__ == "__main__":
     url = "https://www.myntra.com/mailers/apparel-set/arrow/arrow-2-piece-slim-fit-single-breasted-formal-suit/22180132/buy?utm_source=social_share_pdp&utm_medium=deeplink&utm_campaign=social_share_pdp_deeplink"  # Replace with actual Myntra product URL
