@@ -357,9 +357,9 @@ async def add_product(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
         
         # Fetch product details with better error handling
         try:
-            loop = asyncio.get_event_loop()
-            product_data = await loop.run_in_executor(None, scraper_func, url, user_id)
-            # product_data = scraper_func(url, user_id)
+            # loop = asyncio.get_event_loop()
+            # product_data = await loop.run_in_executor(None, scraper_func, url, user_id)
+            product_data = scraper_func(url, user_id)
         except Exception as scraper_error:
             error_msg = str(scraper_error)
             logger.error(f"Scraper error: {error_msg}", exc_info=True)
