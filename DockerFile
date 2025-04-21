@@ -46,6 +46,7 @@
 # CMD ["python", "telegram_bot.py"]
 # Use official Python base image
 # Use official Python base image
+
 FROM python:3.10-slim
 
 # Set environment variables
@@ -76,8 +77,9 @@ RUN apt-get update && apt-get install -y \
 # Verify chromedriver installation and make it executable
 RUN ls -la /usr/bin/chromedriver && \
     chmod +x /usr/bin/chromedriver && \
-    chromedriver --version
-
+    chromedriver --version && \
+    ln -s /usr/bin/chromium /usr/bin/google-chrome
+    
 # Set workdir
 WORKDIR /app
 
