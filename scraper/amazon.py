@@ -259,6 +259,8 @@
 #     print(f"Title: {product_info['title']}")
 #     print(f"Price: {'₹' + str(product_info['price']) if product_info['price'] else 'Not found'}")
 
+
+#amazon.py
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
@@ -281,9 +283,10 @@ def get_amazon_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-
-
-    service = Service('"C:\\Users\\prasa\\Downloads\\chromedriver-win64\\chromedriver-win64\\chromedriver.exe"')  # Path to chromedriver in your Docker container
+    chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
+    options.binary_location = chrome_binary
+    chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "/usr/bin/chromedriver")
+    service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=options)
     result = {"title": "Title not found", "price": None}
     
