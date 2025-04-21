@@ -61,6 +61,10 @@ def get_myntra_price(url, user_id):
 
         print(f"Accessing URL: {url}")
         driver.get(url)
+        with open("page_debug.html", "w", encoding="utf-8") as f:
+            f.write(driver.page_source)
+        print("📝 Saved page source to 'page_debug.html'")
+
         
         # Wait for page to load properly
         time.sleep(3)
