@@ -23,7 +23,7 @@ def get_myntra_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-    options.set_capability("browserName", "chrome")
+    # options.set_capability("browserName", "chrome")
     # Cross-platform Chrome/Chromedriver setup
     if platform.system() == "Windows":
         chrome_binary = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
@@ -31,13 +31,13 @@ def get_myntra_price(url, user_id):
     else:
         chrome_binary = os.environ.get("CHROME_BIN", "/usr/bin/chromium")
         chromedriver_path = os.environ.get("CHROMEDRIVER_PATH", "chromedriver")  # Let PATH resolve it if needed
-
+    options.binary_location = chrome_binary
     # Debug output
     print("CHROME_BIN:", chrome_binary)
     print("CHROMEDRIVER_PATH:", chromedriver_path)
 
     # Set the Chrome binary
-    options.binary_location = chrome_binary
+
     
     result = {"title": "Title not found", "price": None, "mrp": None, "discount": None}
     driver = None
@@ -47,17 +47,9 @@ def get_myntra_price(url, user_id):
         try:
             service = Service(chromedriver_path)
             driver = webdriver.Chrome(service=service, options=options)
-        except Exception as driver_error:
-            print(f"Failed to initialize Chrome with explicit path: {str(driver_error)}")
-            # Fall back to letting Selenium find chromedriver in PATH
-            try:
-                service = Service()
-                driver = webdriver.Chrome(service=service, options=options)
-            except Exception as fallback_error:
-                print(f"Failed to initialize Chrome with PATH: {str(fallback_error)}")
-                # One more attempt with just the binary name
-                service = Service("chromedriver")
-                driver = webdriver.Chrome(service=service, options=options)
+        except Exception as e:
+            print(f"❌ Failed to start ChromeDriver: {str(e)}")
+            return result  # Stop here if Chrome failed to start
 
         print(f"Accessing URL: {url}")
         driver.get(url)
