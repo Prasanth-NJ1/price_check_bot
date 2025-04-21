@@ -24,7 +24,7 @@ def get_flipkart_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-
+    options.set_capability("browserName", "chrome")
     # Detect if running on Windows or Linux (Railway)
     if platform.system() == "Windows":
         chrome_binary = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
@@ -46,16 +46,19 @@ def get_flipkart_price(url, user_id):
     try:
         # Try with explicit path first
         try:
+            print("Trying Explicit chromedriver")
             service = Service(chromedriver_path)
             driver = webdriver.Chrome(service=service, options=options)
         except Exception as driver_error:
             print(f"Failed to initialize Chrome with explicit path: {str(driver_error)}")
             # Fall back to letting Selenium find chromedriver in PATH
             try:
+                print("Trying with default PATH")
                 service = Service()
                 driver = webdriver.Chrome(service=service, options=options)
             except Exception as fallback_error:
                 print(f"Failed to initialize Chrome with PATH: {str(fallback_error)}")
+                print("Trying with final PATH")
                 # One more attempt with just the binary name
                 service = Service("chromedriver")
                 driver = webdriver.Chrome(service=service, options=options)

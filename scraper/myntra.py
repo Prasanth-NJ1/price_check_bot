@@ -23,7 +23,7 @@ def get_myntra_price(url, user_id):
     options.add_argument('--disable-dev-shm-usage')
     options.add_argument('--window-size=1200,800')
     options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36")
-
+    options.set_capability("browserName", "chrome")
     # Cross-platform Chrome/Chromedriver setup
     if platform.system() == "Windows":
         chrome_binary = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
