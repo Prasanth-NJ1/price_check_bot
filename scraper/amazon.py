@@ -464,9 +464,15 @@ def get_amazon_price(url, user_id):
     except Exception as e:
         print(f"Error in scraping: {str(e)[:80]}")
     finally:
-        driver.quit()
+        if driver:  # Only quit if driver was successfully initialized
+            driver.quit()
     
-    # Don't save to database here - let the caller handle that
+        if result["title"] != "Title not found" and result["price"] is not None:
+            try:
+                add_or_update_product(user_id, url, "amazon", result["title"], result["price"])
+                print("[DB] Product saved to MongoDB")
+            except Exception as db_error:
+                print(f"[DB ERROR] Failed to save to MongoDB: {db_error}")
     return result
 
 if __name__ == "__main__":
