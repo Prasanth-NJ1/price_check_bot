@@ -208,7 +208,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Install specific Chrome + Chromedriver (Chrome for Testing)
-ENV CHROME_VERSION=119.0.6045.105
+ENV CHROME_VERSION=135.0.7049.95
 
 RUN wget -q -O chrome-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip && \
     wget -q -O chromedriver-linux64.zip https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip && \
