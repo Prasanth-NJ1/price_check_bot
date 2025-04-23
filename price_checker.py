@@ -155,6 +155,7 @@
 #     print("Starting manual price check...")
 #     changes = check_all_prices()
 #     print(f"Price check complete. Found {changes} price changes.")
+
 # price_checker.py
 import logging
 from datetime import datetime
@@ -198,27 +199,20 @@ def check_price(product_doc):
     try:
         site = product_doc["site"]
         url = product_doc["url"]
-        user_id = product_doc.get("user_id", "unknown")  # Get user_id from product doc
-        
-        # For test product, just simulate the scrape
+        user_id = product_doc.get("user_id", "unknown")  # Get user_id from product doc     
         if "test-product" in url:
             print(f"Test product detected: {product_doc['title']}")
 
             current_price = product_doc["current_price"]
-
-            # Simulate a drop of ₹50 for testing
             new_price = current_price - 50 if current_price > 100 else current_price
 
             new_data = {"price": new_price, "title": product_doc["title"]}
 
         else:
-            # Regular scraping for real products
             scraper_func = get_scraper_function(site)
             if not scraper_func:
                 logger.error(f"No scraper found for site: {site}")
                 return False
-            
-            # Get current price from website - pass user_id if needed
             new_data = scraper_func(url, user_id)
             
         new_price = new_data.get("price")
@@ -228,33 +222,24 @@ def check_price(product_doc):
             return False
             
         current_price = product_doc["current_price"]
-        now = datetime.utcnow()
-        
+        now = datetime.utcnow()        
         print(f"Product: {product_doc['title']}")
         print(f"Current price in DB: {current_price}")
         print(f"New price from scraper: {new_price}")
-        
-        # Check if price changed
+
         if new_price != current_price:
             print(f"PRICE CHANGE DETECTED! Old: {current_price}, New: {new_price}")
-            logger.info(f"Price changed for {product_doc['title']} - Old: {current_price}, New: {new_price}")
-            
-            # Update price history and current price
-            products_collection.update_one(
-                {"_id": product_doc["_id"]},
-                {
-                    "$push": {
-                        "price_history": {
-                            "price": new_price,
-                            "timestamp": now
-                        }
-                    },
-                    "$set": {
-                        "current_price": new_price,
-                        "last_checked": now
-                    }
-                }
-            )
+            logger.info(f"Price changed for {product_doc['title']}: Old: {current_price}, New: {new_price}")
+            products_collection.insert_one({
+                "user_id": user_id,
+                "url": url,
+                "site": site,
+                "title": product_doc['title'],
+                "initial_price": current_price,  # Set this
+                "current_price": new_price,  # And this
+                "price_history": [{"price": new_price, "date": datetime.now()}],
+                "added_on": datetime.now()
+            })
             send_price_drop_alert(user_id, product_doc, new_price)
             return True  # Price changed
         else:

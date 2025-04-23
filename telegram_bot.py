@@ -61,6 +61,18 @@ async def keep_db_alive(context: ContextTypes.DEFAULT_TYPE) -> None:
     except Exception as e:
         logger.error(f"Database keep-alive error: {e}")
 
+def add_or_update_product(user_id, url, site, title, price):
+    try:
+        get_db_connection()  # Ensure connection is active
+        logger.info(f"Adding product: {title} for user {user_id}")
+        
+        # Your database operation code
+        
+        logger.info(f"Product successfully added/updated: {title}")
+    except Exception as e:
+        logger.error(f"Failed to add/update product: {e}", exc_info=True)
+        raise  # Re-raise the exception to handle it in the calling function
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle messages that contain a supported product URL (without using /addproduct)."""
     message_text = update.message.text
@@ -572,6 +584,44 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     else:
         await update.message.reply_text(help_text, parse_mode='Markdown', reply_markup=reply_markup)
 
+# def main() -> None:
+#     """Start the bot."""
+#     if not TELEGRAM_BOT_TOKEN:
+#         logger.error("TELEGRAM_BOT_TOKEN not found in environment variables")
+#         print("Error: TELEGRAM_BOT_TOKEN not found in environment variables")
+#         return
+    
+#     # Create the Application
+#     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
+    
+#     # Add command handlers
+#     application.add_handler(CommandHandler("start", start))
+#     application.add_handler(CommandHandler("help", help_command))
+#     application.add_handler(CommandHandler("subscribe", subscribe))
+#     application.add_handler(CommandHandler("unsubscribe", unsubscribe))
+#     # Make commands more user-friendly by allowing them to be written differently
+#     application.add_handler(CommandHandler("checkall", check_all))
+#     application.add_handler(CommandHandler("check_all", check_all))
+#     application.add_handler(CommandHandler("listproducts", list_products))
+#     application.add_handler(CommandHandler("list_products", list_products))
+#     application.add_handler(CommandHandler("addproduct", add_product))
+#     application.add_handler(CommandHandler("add_product", add_product))
+#     application.add_handler(CommandHandler("deleteproduct", delete_product))
+#     application.add_handler(CommandHandler("delete_product", delete_product))
+    
+#     # Add callback query handler for inline buttons
+#     application.add_handler(CallbackQueryHandler(button_callback))
+    
+#     # Set up job to check prices periodically (e.g., every 6 hours)
+#     job_queue = application.job_queue
+#     job_queue.run_repeating(scheduled_check, interval=21600, first=10)
+    
+#     # Start the Bot
+#     logger.info("Starting bot...")
+#     print("Starting Price Tracker Bot...")
+#     application.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
+#     application.run_polling()
+
 def main() -> None:
     """Start the bot."""
     if not TELEGRAM_BOT_TOKEN:
@@ -583,26 +633,13 @@ def main() -> None:
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     
     # Add command handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("subscribe", subscribe))
-    application.add_handler(CommandHandler("unsubscribe", unsubscribe))
-    # Make commands more user-friendly by allowing them to be written differently
-    application.add_handler(CommandHandler("checkall", check_all))
-    application.add_handler(CommandHandler("check_all", check_all))
-    application.add_handler(CommandHandler("listproducts", list_products))
-    application.add_handler(CommandHandler("list_products", list_products))
-    application.add_handler(CommandHandler("addproduct", add_product))
-    application.add_handler(CommandHandler("add_product", add_product))
-    application.add_handler(CommandHandler("deleteproduct", delete_product))
-    application.add_handler(CommandHandler("delete_product", delete_product))
-    
-    # Add callback query handler for inline buttons
-    application.add_handler(CallbackQueryHandler(button_callback))
+    # ... (your existing handlers)
     
     # Set up job to check prices periodically (e.g., every 6 hours)
     job_queue = application.job_queue
     job_queue.run_repeating(scheduled_check, interval=21600, first=10)
+    # Add the keep_db_alive job to the application's job queue
+    job_queue.run_repeating(keep_db_alive, interval=300, first=10)
     
     # Start the Bot
     logger.info("Starting bot...")
@@ -611,8 +648,8 @@ def main() -> None:
     application.run_polling()
 
 if __name__ == '__main__':
-    job_queue = JobQueue()
-    job_queue.run_repeating(keep_db_alive, interval=300, first=10) 
+    # job_queue = JobQueue()
+    # job_queue.run_repeating(keep_db_alive, interval=300, first=10) 
     main()
 
 
