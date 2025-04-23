@@ -30,8 +30,8 @@ This is a Telegram bot that helps users track product prices on Amazon, Myntra, 
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/yourusername/price-alert-telegram-bot.git
-   cd price-alert-telegram-bot
+   git clone https://github.com/Prasanth-NJ1/price_check_bot.git
+   cd price-check-bot
    ```
 
 2. **Install Dependencies**
